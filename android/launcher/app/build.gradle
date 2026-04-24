@@ -19,7 +19,16 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters "armeabi-v7a"/*, "arm64-v8a"*/
+            abiFilters "armeabi-v7a"
+        }
+
+        // ✅ ADD THIS BLOCK (IMPORTANT FIX)
+        externalNativeBuild {
+            cmake {
+                arguments "-DLIBRW_GL3_GFXLIB=GLFW",
+                          "-DLIBRW_SDL2=OFF",
+                          "-DUSE_SDL2=OFF"
+            }
         }
     }
 
