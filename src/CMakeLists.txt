@@ -83,39 +83,42 @@ else()
     target_compile_definitions(${EXECUTABLE} PRIVATE USE_OUR_VERSIONING)
 endif()
 
-if(${PROJECT}_AUDIO STREQUAL "OAL")
-    find_package(OpenAL REQUIRED)
-    if(TARGET OpenAL::OpenAL)
-        target_link_libraries(${EXECUTABLE} PRIVATE OpenAL::OpenAL)
-    else()
-        target_include_directories(${EXECUTABLE} PRIVATE ${OPENAL_INCLUDE_DIR})
-        target_link_libraries(${EXECUTABLE} PRIVATE ${OPENAL_LIBRARY})
-        target_compile_definitions(${EXECUTABLE} PRIVATE ${OPENAL_DEFINITIONS})
+# Audio library setup - Skip on Android as it uses OpenSLES instead
+if(NOT ANDROID)
+    if(${PROJECT}_AUDIO STREQUAL "OAL")
+        find_package(OpenAL REQUIRED)
+        if(TARGET OpenAL::OpenAL)
+            target_link_libraries(${EXECUTABLE} PRIVATE OpenAL::OpenAL)
+        else()
+            target_include_directories(${EXECUTABLE} PRIVATE ${OPENAL_INCLUDE_DIR})
+            target_link_libraries(${EXECUTABLE} PRIVATE ${OPENAL_LIBRARY})
+            target_compile_definitions(${EXECUTABLE} PRIVATE ${OPENAL_DEFINITIONS})
+        endif()
+        target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OAL)
+    elseif(${PROJECT}_AUDIO STREQUAL "MSS")
+        find_package(MilesSDK REQUIRED)
+        target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_MSS)
+        target_link_libraries(${EXECUTABLE} PRIVATE MilesSDK::MilesSDK)
     endif()
-    target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OAL)
-elseif(${PROJECT}_AUDIO STREQUAL "MSS")
-    find_package(MilesSDK REQUIRED)
-    target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_MSS)
-    target_link_libraries(${EXECUTABLE} PRIVATE MilesSDK::MilesSDK)
-endif()
 
-find_package(mpg123 REQUIRED)
-target_link_libraries(${EXECUTABLE} PRIVATE
-    MPG123::libmpg123
-)
-if(${PROJECT}_WITH_OPUS)
-    find_package(opusfile REQUIRED)
+    find_package(mpg123 REQUIRED)
     target_link_libraries(${EXECUTABLE} PRIVATE
-        opusfile::opusfile
+        MPG123::libmpg123
     )
-    target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OPUS)
-endif()
-if(${PROJECT}_WITH_LIBSNDFILE)
-    find_package(SndFile REQUIRED)
-    target_link_libraries(${EXECUTABLE} PRIVATE
-        SndFile::SndFile
-    )
-    target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OAL_USE_SNDFILE)
+    if(${PROJECT}_WITH_OPUS)
+        find_package(opusfile REQUIRED)
+        target_link_libraries(${EXECUTABLE} PRIVATE
+            opusfile::opusfile
+        )
+        target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OPUS)
+    endif()
+    if(${PROJECT}_WITH_LIBSNDFILE)
+        find_package(SndFile REQUIRED)
+        target_link_libraries(${EXECUTABLE} PRIVATE
+            SndFile::SndFile
+        )
+        target_compile_definitions(${EXECUTABLE} PRIVATE AUDIO_OAL_USE_SNDFILE)
+    endif()
 endif()
 
 target_compile_definitions(${EXECUTABLE} PRIVATE )
@@ -133,7 +136,7 @@ if(${PROJECT}_WITH_SANITIZERS)
     target_compile_options(${EXECUTABLE} PUBLIC
             -fsanitize=undefined,float-divide-by-zero,integer,implicit-conversion,implicit-integer-truncation,implicit-integer-arithmetic-value-change,local-bounds,nullability
             -g3 -fno-omit-frame-pointer)
-    target_link_options(${EXECUTABLE} PUBLIC -fsanitize=undefined,float-divide-by-zero,integer,implicit-conversion,implicit-integer-truncation,implicit-integer-arithmetic-value-change,local-bounds,nullability)
+    target_link_options(${EXECUTABLE} PUBLIC -fsanitize=undefined,float-divide-by-zero,integer,implicit-conversion,implicit-integer-truncation,implicit-integer-arithmetic-value-change,local-bounds,nullability -g3 -fno-omit-frame-pointer)
 endif()
 
 if(${PROJECT}_WITH_ASAN)
