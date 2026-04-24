@@ -32,10 +32,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      # ✅ FIX: Patch librw (correct path from android/launcher)
-      - name: Patch librw (disable SDL2 for Android)
+      # ✅ FINAL FIX: disable SDL2 + GLFW completely
+      - name: Patch librw (Android compatible)
         run: |
-          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "GLFW"/g' ../../vendor/librw/CMakeLists.txt
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "NONE"/g' ../../vendor/librw/CMakeLists.txt
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "GLFW"/set(LIBRW_GL3_GFXLIB      "NONE"/g' ../../vendor/librw/CMakeLists.txt
           sed -i 's/-DLIBRW_SDL2 -DUSE_SDL2//g' ../../vendor/librw/CMakeLists.txt
 
       - name: Setup JDK 17
@@ -55,7 +56,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Clean build cache (important)
+      - name: Clean build cache
         run: rm -rf ~/.gradle/caches build .cxx
 
       - name: Gradle clean
@@ -87,10 +88,11 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      # ✅ SAME FIX HERE
-      - name: Patch librw (disable SDL2 for Android)
+      # ✅ SAME PATCH HERE
+      - name: Patch librw (Android compatible)
         run: |
-          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "GLFW"/g' ../../vendor/librw/CMakeLists.txt
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "NONE"/g' ../../vendor/librw/CMakeLists.txt
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "GLFW"/set(LIBRW_GL3_GFXLIB      "NONE"/g' ../../vendor/librw/CMakeLists.txt
           sed -i 's/-DLIBRW_SDL2 -DUSE_SDL2//g' ../../vendor/librw/CMakeLists.txt
 
       - name: Setup JDK 17
@@ -110,7 +112,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Clean build cache (important)
+      - name: Clean build cache
         run: rm -rf ~/.gradle/caches build .cxx
 
       - name: Build Release APK
