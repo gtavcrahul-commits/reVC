@@ -11,7 +11,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Used to load the 'game' library on application startup.
     static {
-        //System.loadLibrary("revc");
+        System.loadLibrary("revc");
     }
 
     private ActivityMainBinding binding;
