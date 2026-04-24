@@ -32,6 +32,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      # ✅ FIX: Patch librw (REMOVE SDL2)
+      - name: Patch librw (disable SDL2 for Android)
+        run: |
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "GLFW"/g' vendor/librw/CMakeLists.txt
+          sed -i 's/-DLIBRW_SDL2 -DUSE_SDL2//g' vendor/librw/CMakeLists.txt
+
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
@@ -42,11 +48,7 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # ✅ FIX: Install SDL2
-      - name: Install SDL2 (required for librw)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-dev
+      # ❌ SDL2 REMOVED (not needed anymore)
 
       - name: Install NDK & CMake
         run: |
@@ -54,6 +56,9 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Clean build cache (important)
+        run: rm -rf ~/.gradle/caches build .cxx
 
       - name: Gradle clean
         run: ./gradlew clean
@@ -84,6 +89,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
+      # ✅ SAME PATCH HERE
+      - name: Patch librw (disable SDL2 for Android)
+        run: |
+          sed -i 's/set(LIBRW_GL3_GFXLIB      "SDL2"/set(LIBRW_GL3_GFXLIB      "GLFW"/g' vendor/librw/CMakeLists.txt
+          sed -i 's/-DLIBRW_SDL2 -DUSE_SDL2//g' vendor/librw/CMakeLists.txt
+
       - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
@@ -94,18 +105,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      # ✅ FIX: Install SDL2 here too
-      - name: Install SDL2 (required for librw)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libsdl2-dev
-
       - name: Install NDK & CMake
         run: |
-          sdkmanager "ndk;25.2.9519653" "cmake;3.22.1"
+          sdkmanager "ndk;27.2.12479018" "cmake;3.22.1"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Clean build cache (important)
+        run: rm -rf ~/.gradle/caches build .cxx
 
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon --stacktrace --build-cache
