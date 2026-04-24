@@ -1,4 +1,4 @@
-plugins {
+pluginss {
     alias(libs.plugins.android.application)
 }
 
