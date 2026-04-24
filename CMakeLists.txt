@@ -22,6 +22,16 @@ if(NOT COMMAND reVC_platform_target)
     endfunction()
 endif()
 
+# Configure librw for Android
+if(ANDROID)
+    message(STATUS "Configuring librw for Android platform")
+    set(LIBRW_PLATFORM_GL3 ON CACHE BOOL "Use OpenGL 3" FORCE)
+    set(LIBRW_GL3_GFXLIB SDL2 CACHE STRING "Graphics library" FORCE)
+    
+    # Skip SDL2 package find - use Android NDK bundled version
+    set(SDL2_INCLUDE_DIR_NOTFOUND TRUE)
+endif()
+
 if(WIN32)
     set(${PROJECT}_AUDIOS "OAL" "MSS")
 else()
